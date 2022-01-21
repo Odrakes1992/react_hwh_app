@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Form, Button } from "react-bootstrap";
 import { MdSwipe } from "react-icons/md";
 
-const Header = styled.div`
+export const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,6 +37,8 @@ class Home extends Component {
   // const [selectedFile, setSelectedFile] = useState();
   // const [isFilePicked, setIsFilePicked] = useState(false);
 
+  // The above would need to be changed from a class component to a function to use state etc see results component
+
   render() {
     return (
       <StyledDiv>
@@ -56,7 +58,7 @@ class Home extends Component {
             <br />
             By the way this is in no way affiliated with the Hinge guys, <br />{" "}
             just hoping that they dont send a cease and desist ... styling is
-            merely coincidence.
+            merely coincidental.
           </p>{" "}
         </StyledDiv>
 
