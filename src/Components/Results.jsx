@@ -16,8 +16,32 @@ import { MdSwipe } from "react-icons/md";
 import { Chart as ChartJS } from "chart.js/auto";
 import Header from "./Home";
 
+let resultsHinge = {
+  totalSeen: 0,
+  totalLikes: 0,
+  totalLeftSwipes: 0,
+};
+
 let total = Object.keys(JsonData).length;
 let test = 0;
+
+// Testing results
+
+// x = [1,2,3,5,6,7]
+
+// let types = {
+//   positive: 0,
+//   negative:0,
+//   zero:0
+// }
+
+// x.forEach((el) =>{
+//   if(el > 0) {
+//     types.positive += 1
+//   }
+// })
+
+// console.log(types.positive)
 
 const countItems = JsonData.map((info) => {
   if (info.hasOwnProperty("check")) {
