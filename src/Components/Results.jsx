@@ -1,5 +1,5 @@
 import React from "react";
-import JsonData from "../testData.json";
+import JsonData from "../matches.json";
 import { Pie, Doughnut, Line, Bar, Chart } from "react-chartjs-2";
 import { MdSwipe } from "react-icons/md";
 // import {
@@ -14,6 +14,7 @@ import { MdSwipe } from "react-icons/md";
 //   ArcElement,
 // } from "chart.js";
 import { Chart as ChartJS } from "chart.js/auto";
+
 import Header from "./Home";
 
 let resultsHinge = {
@@ -44,8 +45,10 @@ let test = 0;
 // console.log(types.positive)
 
 const countItems = JsonData.map((info) => {
-  if (info.hasOwnProperty("check")) {
-    test += 1;
+  if (info.hasOwnProperty("like")) {
+    resultsHinge.totalLikes += 1;
+  } else if (info.hasOwnProperty("block")) {
+    resultsHinge.totalLeftSwipes += 1;
   }
 });
 
@@ -55,16 +58,10 @@ const state = {
   datasets: [
     {
       label: "Rainfall",
-      backgroundColor: ["#B21F00", "#C9DE00", "#2FDE00", "#00A6B4", "#6800B4"],
-      hoverBackgroundColor: [
-        "#501800",
-        "#4B5000",
-        "#175000",
-        "#003350",
-        "#35014F",
-      ],
+      backgroundColor: ["#B21F00", "#00A6B4", "#6800B4"],
+      hoverBackgroundColor: ["#501800", "#003350", "#35014F"],
       //data: [65, 59, 80, 81, 56],
-      data: [total, test],
+      data: [resultsHinge.totalLikes, resultsHinge.totalLeftSwipes],
     },
   ],
 };
@@ -75,11 +72,15 @@ function Results() {
       <h1>
         Hinge Will Happen <MdSwipe />
       </h1>
-
+      <hr className="my-4" />
       <p>
         First and foremost, check the fun chart below that's how picky you were
-        pal! You swiped left on a total <strong>{test}</strong> people, damn. No
-        judgement here.
+        pal! You swiped left on a total{" "}
+        <strong>{resultsHinge.totalLeftSwipes}</strong> people, damn. No
+        judgement here. <br />
+        <br /> For a bit more quick maths that's{" "}
+        {Math.floor((resultsHinge.totalLeftSwipes / total) * 100)}% not making
+        the cut.
       </p>
       {/* <Pie
         data={state}
@@ -103,11 +104,13 @@ function Results() {
               display: true,
               text: "Average Rainfall per month",
               fontSize: 20,
+              //width={"30%"},
             },
             legend: {
               display: true,
               position: "right",
             },
+            maintainAspectRatio: false,
           }}
         />
       </div>
