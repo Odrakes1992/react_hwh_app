@@ -1,27 +1,44 @@
 import React from "react";
 import JsonData from "../matches.json";
-import { Pie, Doughnut, Line, Bar, Chart } from "react-chartjs-2";
+import { Doughnut, PolarArea, Bar, Chart } from "react-chartjs-2";
 import { MdSwipe } from "react-icons/md";
-// import {
-//   RadialLinearScale,
-//   PointElement,
-//   LineElement,
-//   Filler,
-//   Tooltip,
-//   Legend,
-//   LayoutPosition,
-//   Chart,
-//   ArcElement,
-// } from "chart.js";
+import styled from "styled-components";
 import { Chart as ChartJS } from "chart.js/auto";
 
-import Header from "./Home";
+import randomColor from "randomcolor";
+
+var color = randomColor();
+
+const StyledDiv = styled.div`
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 18px;
+  flex-direction: row;
+`;
+
+const ChartDiv = styled.div`
+  padding: 10px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+`;
+
+const TextDiv = styled.div`
+  font-size: 30px;
+  margin: 85px;
+`;
+
+Array.prototype.sample = function () {
+  return this[Math.floor(Math.random() * this.length)];
+};
 
 let resultsHinge = {
   totalSeen: 0,
   totalLikes: 0,
   totalLeftSwipes: 0,
   matches: 0,
+  meets: [],
   openers: [],
   frequency: {
     0: 0,
@@ -41,24 +58,6 @@ let resultsHinge = {
 
 let total = Object.keys(JsonData).length;
 
-// Testing results
-
-// x = [1,2,3,5,6,7]
-
-// let types = {
-//   positive: 0,
-//   negative:0,
-//   zero:0
-// }
-
-// x.forEach((el) =>{
-//   if(el > 0) {
-//     types.positive += 1
-//   }
-// })
-
-// console.log(types.positive)
-
 const countItems = JsonData.map((info) => {
   if (info.hasOwnProperty("like") && !info.hasOwnProperty("match")) {
     resultsHinge.totalLikes += 1;
@@ -73,19 +72,23 @@ const countItems = JsonData.map((info) => {
     resultsHinge.frequency[getInt] += 1;
   } else if (info.hasOwnProperty("match")) {
     resultsHinge.matches += 1;
-    console.log(resultsHinge.matches);
+    if (info.hasOwnProperty("chats") && info.chats.length > 1) {
+      resultsHinge.openers.push(info.chats[0].body);
+    }
+    if (info.hasOwnProperty("we_met")) {
+      let messageLength = info.chats.length;
+      resultsHinge.meets.push(messageLength);
+      console.log(resultsHinge.meets);
+    }
   }
 });
 
-const state = {
-  //labels: ["January", "February", "March", "April", "May"],
+const swipeActivity = {
   labels: ["Yes", "No"],
   datasets: [
     {
-      label: "Rainfall",
       backgroundColor: ["#B21F00", "#00A6B4", "#6800B4"],
       hoverBackgroundColor: ["#501800", "#003350", "#35014F"],
-      //data: [65, 59, 80, 81, 56],
       data: [resultsHinge.totalLikes, resultsHinge.totalLeftSwipes],
     },
   ],
@@ -106,69 +109,79 @@ const frequency = {
     "November",
     "December",
   ],
-  //labels: ["Yes", "No"],
+
   datasets: [
     {
-      label: "your activity throughout the year",
+      label: "Your Left and Right Swipes",
       backgroundColor: ["#B21F00", "#00A6B4"],
       hoverBackgroundColor: ["#501800", "#003350"],
-      //data: [65, 59, 80, 81, 56],
       data: Object.values(resultsHinge.frequency),
+    },
+  ],
+};
+
+const matchesChats = {
+  labels: resultsHinge.meets.map((el) => {
+    let chatNumber = resultsHinge.meets.indexOf(el) + 1;
+    return `Chat No-${chatNumber}`;
+  }),
+  datasets: [
+    {
+      label: "your most active message",
+      backgroundColor: ["#B21F00", "#00A6B4"],
+      hoverBackgroundColor: ["#501800", "#003350"],
+      data: resultsHinge.meets,
     },
   ],
 };
 
 function Results() {
   return (
-    <div>
+    <StyledDiv>
       <h1>
         Hinge Will Happen <MdSwipe />
       </h1>
       <hr className="my-4" />
-      <p>
-        First and foremost, check the fun chart below - that's how picky you
-        were pal! You swiped left on a total{" "}
-        <strong>{resultsHinge.totalLeftSwipes}</strong> people, damn. No
-        judgement here. <br />
-        <br /> For a bit more quick maths that's{" "}
-        {Math.floor((resultsHinge.totalLeftSwipes / total) * 100)}% not making
-        the cut. You also matched with <strong>{resultsHinge.matches}</strong>{" "}
-        people, lucky you I guess 🧐 <br></br> Well you fared better than Todo
-        in season 1 of Jujutsu Kaisen, so I guess that's something.
-      </p>
-      {/* <Pie
-        data={state}
-        options={{
-          title: {
-            display: true,
-            text: "Average Rainfall per month",
-            fontSize: 20,
-          },
-          legend: {
-            display: true,
-            position: "right",
-          },
-        }}
-      /> */}
+      <TextDiv>
+        <p>
+          First and foremost, check that fun chart below - that's how picky you
+          were pal! You swiped left on a total{" "}
+          <strong>{resultsHinge.totalLeftSwipes}</strong> people, damn. No
+          judgement here. <br />
+          <br /> So that's{" "}
+          {Math.floor((resultsHinge.totalLeftSwipes / total) * 100)}% not making
+          the cut. You also matched with <strong>{resultsHinge.matches}</strong>{" "}
+          people, lucky you I guess 🧐 <br></br> Well you fared better than Todo
+          in season 1 of Jujutsu Kaisen, so I guess that's something.
+        </p>
+      </TextDiv>
+      <br />
+      <br />
       <div>
         <Doughnut
-          data={state}
+          data={swipeActivity}
           options={{
             title: {
               display: true,
               text: "Swiping activity",
-              fontSize: 20,
-              //width={"30%"},
             },
             legend: {
               display: true,
               position: "right",
             },
-            maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 3,
           }}
         />
       </div>
-
+      <br />
+      <br />
+      <TextDiv>
+        <p>Now, lets look at your activity throughout the year.</p>
+      </TextDiv>
+      <br />
+      <br />
       <div>
         <Bar
           data={frequency}
@@ -183,17 +196,20 @@ function Results() {
               display: true,
               position: "right",
             },
-            maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 3,
           }}
         />
       </div>
+      <br />
+      <br />
 
-      <div>
+      <TextDiv>
         <p>
           {" "}
-          Ok, so you can see how active you were throughout the year, the
-          question is though was this a good return for the amount of swiping
-          that occurred....<br></br>
+          Ok, so these were your active months, question is, was this a good
+          return for the amount of swiping that occurred?<br></br>
           Ok that was rhetorical, but to help with this internal reflection
           think about it this way your match to swipe ratio was roughly 1 match
           for every{" "}
@@ -202,15 +218,60 @@ function Results() {
           </strong>
           .
         </p>
-      </div>
+      </TextDiv>
+      <TextDiv>
+        <p>
+          Now, how about that chat 💬
+          <br />
+          These are the number of messages you sent to the people you ended up
+          meeting in person.
+        </p>
+      </TextDiv>
+      <br />
+      <div>
+        <PolarArea
+          data={matchesChats}
+          options={{
+            title: {
+              display: true,
+            },
+            legend: {
+              display: true,
+              position: "right",
+            },
+            maintainAspectRatio: true,
+            responsive: true,
+            aspectRatio: 2,
+            plugins: {
+              datalabels: {
+                display: false,
+              },
+              legend: {
+                display: false,
+              },
+            },
+          }}
+        />
 
-      <p>
-        You were quite conversationalist, of the ones that you matched you had a
-        few back and forths. Our favourite opener was.... ok this is a joke it
-        wasn't our favourite opener, we just chose one at random. If it's a
-        funny one - you are welcome, if it's not well that's on you.
-      </p>
-    </div>
+        <TextDiv>
+          {" "}
+          <p>
+            You were quite conversationalist, of the ones that you matched you
+            had a few back and forths. Our favourite opener was{" "}
+          </p>
+          <div>
+            <strong>"{resultsHinge.openers.sample()}"</strong>
+          </div>
+          <p>
+            ok this is a joke it wasn't our favourite opener, we just chose one
+            at random. If it's a funny one - you are welcome, if it's not well
+            that's on you.
+          </p>
+        </TextDiv>
+      </div>
+      <br />
+      <br />
+    </StyledDiv>
   );
 }
 
