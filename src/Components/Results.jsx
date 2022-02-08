@@ -83,6 +83,11 @@ const countItems = JsonData.map((info) => {
   }
 });
 
+let textMatches =
+  resultsHinge.meets.length < 2
+    ? "You only met up with one person, listen we are only going by the data here."
+    : `According to the hinge data you met up with ${resultsHinge.meets.length} people, we won't reveal how many were your type 😘`;
+
 const swipeActivity = {
   labels: ["Yes", "No"],
   datasets: [
@@ -255,17 +260,24 @@ function Results() {
 
         <TextDiv>
           {" "}
-          <p>
-            You were quite conversationalist, of the ones that you matched you
-            had a few back and forths. Our favourite opener was{" "}
-          </p>
-          <div>
-            <strong>"{resultsHinge.openers.sample()}"</strong>
+          <div className="row" style={{ display: "flex" }}>
+            <p className="column" style={{ fontSize: "35px", flex: "50%" }}>
+              You were quite conversationalist, of the ones that you matched you
+              had a few back and forths. Our favourite opener was 👉
+            </p>
+            <div className="columns" style={{ fontSize: "40px", flex: "50%" }}>
+              <strong>"{resultsHinge.openers.sample()}"</strong>
+            </div>
           </div>
           <p>
-            ok this is a joke it wasn't our favourite opener, we just chose one
-            at random. If it's a funny one - you are welcome, if it's not well
-            that's on you.
+            <br />
+            <br />
+            Ok, this is a joke it wasn't our favourite opener, we just chose one
+            at random. <br /> If it's a funny one - you are welcome, if it's not
+            well that's on you.
+            <br />
+            <br />
+            {textMatches}
           </p>
         </TextDiv>
       </div>
