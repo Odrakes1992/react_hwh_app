@@ -1,8 +1,10 @@
-import React, { Component } from "react";
-import { useState } from "react";
+import React, { Component, createContext } from "react";
+import { useState, useReducer } from "react";
 import styled from "styled-components";
 import { Form, Button } from "react-bootstrap";
 import { MdSwipe } from "react-icons/md";
+import { Link } from "react-router-dom";
+import Results from "./Results";
 
 export const Header = styled.div`
   display: flex;
@@ -33,56 +35,86 @@ const BottomView = styled.div`
   position: relative;
 `;
 
-class Home extends Component {
-  // const [selectedFile, setSelectedFile] = useState();
-  // const [isFilePicked, setIsFilePicked] = useState(false);
+function Home() {
+  //const [data, setData] = useState([]);
 
-  // The above would need to be changed from a class component to a function to use state etc see results component
+  const [data, setData] = useState([]);
 
-  render() {
-    return (
-      <StyledDiv>
-        <Header>
-          {" "}
-          Hinge Will Happen <MdSwipe />
-        </Header>
-        <hr className="my-4" />
-        <StyledDiv>
-          <p>
-            Ever wondered if there was some kinda Hinge yearly wrap up.. <br />{" "}
-            Just so you know how often you swiped left (or right) on those voice
-            prompts ? Well <br /> I wish Hinge could tell you but they don't. I
-            mean they do but who is really trying to parse through <br />
-            some Json data. This is where we come in, give us the data and we
-            will make it make sense. <br />
-            <br />
-            By the way this is in no way affiliated with the Hinge guys, <br />{" "}
-            just hoping that they dont send a cease and desist ... styling is
-            merely coincidental.
-          </p>{" "}
-        </StyledDiv>
+  const [errorData, setErrorData] = useState("");
+  const [isUploaded, setIsUploaded] = useState(false);
 
-        <BottomView>
-          <p classname="paragraph">
-            Download your data and upload your <strong>'matches.json'</strong>{" "}
-            file
-          </p>{" "}
-        </BottomView>
-        <br></br>
+  console.log(data.length == 0);
 
+  const readFileOnUpload = (uploadedFile) => {
+    const fileReader = new FileReader();
+    fileReader.onloadend = () => {
+      try {
+        const uploadedData = JSON.parse(fileReader.result);
+        setData(uploadedData);
+        //setData(JSON.parse(fileReader.result));
+        //console.log(uploadedData);
+        setErrorData(null);
+        setIsUploaded(true);
+        console.log(data.length == 0);
+      } catch (e) {
+        setErrorData("**Not valid JSON file!**");
+      }
+    };
+
+    if (uploadedFile !== undefined) fileReader.readAsText(uploadedFile);
+  };
+
+  //console.log(data);
+
+  return (
+    <StyledDiv>
+      {data.length == 0 && (
         <div>
-          <FileInput
-            type="file"
-            //onChange={}
-            accept="application/JSON"
-          />
-          <Button variant="dark" type="submit">
-            Submit
-          </Button>
+          <Header>
+            {" "}
+            Hinge Will Happen <MdSwipe />
+          </Header>
+          <hr className="my-4" />
+          <StyledDiv>
+            <p>
+              Ever wondered if there was some kinda Hinge yearly wrap up..{" "}
+              <br /> Just so you know how often you swiped left (or right) on
+              those voice prompts ? Well <br /> I wish Hinge could tell you but
+              they don't. I mean they do but who is really trying to parse
+              through <br />
+              some Json data. This is where we come in, give us the data and we
+              will make it make sense. <br />
+              <br />
+              By the way this is in no way affiliated with the Hinge guys,{" "}
+              <br /> just hoping that they dont send a cease and desist ...
+              styling is merely coincidental.
+            </p>{" "}
+          </StyledDiv>
+
+          <BottomView>
+            <p className="paragraph">
+              Download your data and upload your <strong>'matches.json'</strong>{" "}
+              file
+            </p>{" "}
+          </BottomView>
+          <br></br>
+
+          <div>
+            <form>
+              <input
+                type="file"
+                onChange={(e) => readFileOnUpload(e.target.files[0])}
+                accept="application/JSON"
+              />
+            </form>
+          </div>
         </div>
-      </StyledDiv>
-    );
-  }
+      )}
+
+      {data.length > 0 && <Results data={data} />}
+    </StyledDiv>
+  );
 }
 
 export default Home;
+//&& <Results data={data} />

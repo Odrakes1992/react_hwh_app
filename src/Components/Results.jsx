@@ -1,9 +1,12 @@
 import React from "react";
-import JsonData from "../matches.json";
 import { Doughnut, PolarArea, Bar, Chart } from "react-chartjs-2";
 import { MdSwipe } from "react-icons/md";
 import styled from "styled-components";
 import { Chart as ChartJS } from "chart.js/auto";
+import { useContext } from "react";
+//import data from "./Home";
+
+import { DataContext } from "./Home";
 
 import randomColor from "randomcolor";
 
@@ -33,114 +36,118 @@ Array.prototype.sample = function () {
   return this[Math.floor(Math.random() * this.length)];
 };
 
-let resultsHinge = {
-  totalSeen: 0,
-  totalLikes: 0,
-  totalLeftSwipes: 0,
-  matches: 0,
-  meets: [],
-  openers: [],
-  frequency: {
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-    8: 0,
-    9: 0,
-    10: 0,
-    11: 0,
-  },
-};
+function Results({ data }) {
+  let resultsHinge = {
+    totalSeen: 0,
+    totalLikes: 0,
+    totalLeftSwipes: 0,
+    matches: 0,
+    meets: [],
+    openers: [],
+    frequency: {
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+      6: 0,
+      7: 0,
+      8: 0,
+      9: 0,
+      10: 0,
+      11: 0,
+    },
+  };
 
-let total = Object.keys(JsonData).length;
+  const JsonData = data;
 
-const countItems = JsonData.map((info) => {
-  if (info.hasOwnProperty("like") && !info.hasOwnProperty("match")) {
-    resultsHinge.totalLikes += 1;
-    // to refactor
-    let month = new Date(info.like[0].timestamp);
-    let getInt = month.getMonth();
-    resultsHinge.frequency[getInt] += 1;
-  } else if (info.hasOwnProperty("block")) {
-    resultsHinge.totalLeftSwipes += 1;
-    let month = new Date(info.block[0].timestamp);
-    let getInt = month.getMonth();
-    resultsHinge.frequency[getInt] += 1;
-  } else if (info.hasOwnProperty("match")) {
-    resultsHinge.matches += 1;
-    if (info.hasOwnProperty("chats") && info.chats.length > 1) {
-      resultsHinge.openers.push(info.chats[0].body);
+  console.log(JsonData);
+
+  let total = Object.keys(JsonData).length;
+
+  const countItems = JsonData.map((info) => {
+    if (info.hasOwnProperty("like") && !info.hasOwnProperty("match")) {
+      resultsHinge.totalLikes += 1;
+      // to refactor
+      let month = new Date(info.like[0].timestamp);
+      let getInt = month.getMonth();
+      resultsHinge.frequency[getInt] += 1;
+    } else if (info.hasOwnProperty("block")) {
+      resultsHinge.totalLeftSwipes += 1;
+      let month = new Date(info.block[0].timestamp);
+      let getInt = month.getMonth();
+      resultsHinge.frequency[getInt] += 1;
+    } else if (info.hasOwnProperty("match")) {
+      resultsHinge.matches += 1;
+      if (info.hasOwnProperty("chats") && info.chats.length > 1) {
+        resultsHinge.openers.push(info.chats[0].body);
+      }
+      if (info.hasOwnProperty("we_met")) {
+        let messageLength = info.chats.length;
+        resultsHinge.meets.push(messageLength);
+        //console.log(resultsHinge.meets);
+      }
     }
-    if (info.hasOwnProperty("we_met")) {
-      let messageLength = info.chats.length;
-      resultsHinge.meets.push(messageLength);
-      console.log(resultsHinge.meets);
-    }
-  }
-});
+  });
 
-let textMatches =
-  resultsHinge.meets.length < 2
-    ? "You only met up with one person, listen we are only going by the data here."
-    : `According to the hinge data you met up with ${resultsHinge.meets.length} people, we won't reveal how many were your type 😘`;
+  let textMatches =
+    resultsHinge.meets.length < 2
+      ? "You only met up with one person, listen we are only going by the data here."
+      : `According to the hinge data you met up with ${resultsHinge.meets.length} people, we won't reveal how many were your type 😘`;
 
-const swipeActivity = {
-  labels: ["Yes", "No"],
-  datasets: [
-    {
-      backgroundColor: ["#B21F00", "#00A6B4", "#6800B4"],
-      hoverBackgroundColor: ["#501800", "#003350", "#35014F"],
-      data: [resultsHinge.totalLikes, resultsHinge.totalLeftSwipes],
-    },
-  ],
-};
+  const swipeActivity = {
+    labels: ["Yes", "No"],
+    datasets: [
+      {
+        backgroundColor: ["#B21F00", "#00A6B4", "#6800B4"],
+        hoverBackgroundColor: ["#501800", "#003350", "#35014F"],
+        data: [resultsHinge.totalLikes, resultsHinge.totalLeftSwipes],
+      },
+    ],
+  };
 
-const frequency = {
-  labels: [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ],
+  const frequency = {
+    labels: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
 
-  datasets: [
-    {
-      label: "Your Left and Right Swipes",
-      backgroundColor: ["#B21F00", "#00A6B4"],
-      hoverBackgroundColor: ["#501800", "#003350"],
-      data: Object.values(resultsHinge.frequency),
-    },
-  ],
-};
+    datasets: [
+      {
+        label: "Your Left and Right Swipes",
+        backgroundColor: ["#B21F00", "#00A6B4"],
+        hoverBackgroundColor: ["#501800", "#003350"],
+        data: Object.values(resultsHinge.frequency),
+      },
+    ],
+  };
 
-const matchesChats = {
-  labels: resultsHinge.meets.map((el) => {
-    let chatNumber = resultsHinge.meets.indexOf(el) + 1;
-    return `Chat No-${chatNumber}`;
-  }),
-  datasets: [
-    {
-      label: "your most active message",
-      backgroundColor: ["#B21F00", "#00A6B4"],
-      hoverBackgroundColor: ["#501800", "#003350"],
-      data: resultsHinge.meets,
-    },
-  ],
-};
+  const matchesChats = {
+    labels: resultsHinge.meets.map((el) => {
+      let chatNumber = resultsHinge.meets.indexOf(el) + 1;
+      return `Chat No-${chatNumber}`;
+    }),
+    datasets: [
+      {
+        label: "your most active message",
+        backgroundColor: ["#B21F00", "#00A6B4"],
+        hoverBackgroundColor: ["#501800", "#003350"],
+        data: resultsHinge.meets,
+      },
+    ],
+  };
 
-function Results() {
   return (
     <StyledDiv>
       <h1>
