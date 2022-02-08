@@ -95,7 +95,11 @@ function Home() {
             <p className="paragraph">
               Download your data and upload your <strong>'matches.json'</strong>{" "}
               file
-            </p>{" "}
+              <br />
+              Don't know how to get your data. Follow these{" "}
+              <Link to={{ pathname: "instructions" }}>instructions</Link>.
+              <br></br>
+            </p>
           </BottomView>
           <br></br>
 
