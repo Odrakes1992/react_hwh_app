@@ -22,7 +22,7 @@ function Instructions() {
           it is on its way.
         </li>
         <li>
-          This can take a while to come through, so a bit patience young one.
+          This can take a while to come through, so a bit of patience young one.
         </li>
         <li>
           When you have receive the data, download and unzip that file, I think
